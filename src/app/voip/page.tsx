@@ -11,6 +11,12 @@ export default function Page() {
     const [users, setUsers] = useState([]);
     const [callState, setCallState] = useState<CallState | null>(null);
 
+    const [callee, setCallee] = useState<{
+        username: string,
+        sid: String,
+    } | null>(null)
+
+
     useEffect(() => {
         socketRef.current = new Signaling();
         webRtcRef.current = new WebRTCManager();
@@ -29,12 +35,12 @@ export default function Page() {
     }, []);
 
 
-    const offerHandler = (sid: string) => {
+    const offerHandler = (username: string, sid: string) => {
         if (!webRtcRef.current)
             return;
 
         setCallState('calling')
-
+        setCallee({ username, sid })
     }
 
     return (
@@ -51,7 +57,10 @@ export default function Page() {
 
             {
                 callState && (
-                    <CallerPage callState={callState} />
+                    <CallerPage 
+                        callState={callState}
+                        details={callee}
+                    />
                 )
             }
         </>

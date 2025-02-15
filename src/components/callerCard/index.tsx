@@ -8,7 +8,7 @@ interface CallerCardProps {
     username: string,
     sid: string,
     online: boolean,
-    offerHandler: (sid: string) => void,
+    offerHandler: (username: string, sid: string) => void,
 }
 
 
@@ -23,7 +23,7 @@ const CallerCard: FC<CallerCardProps> = ({
 
     const initiateCall = () => {
         console.log("initiating the call");
-        offerHandler(sid)
+        offerHandler(username, sid)
     }
 
     const changeButtonStatus = () => {

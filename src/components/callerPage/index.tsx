@@ -8,10 +8,11 @@ import RoundButton from "@/components/roundButton";
 
 interface CallerPageProps { 
     callState: CallState;
+    details: { username: string, sid: string, }
 }
 export type CallState = "calling" | "oncall" | "incoming" | "ended";
 
-const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
+const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
     const [isToggled, setIsToggled] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [isRecorded, setIsRecorded] = useState(false);
@@ -149,7 +150,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
             <Navbar />
             <div className="flex flex-col h-[650px] justify-between px-4 text-center">
             <div className="flex flex-col items-center mt-[180px]">
-                    <h1 className="text-3xl md:text-5xl font-bold text-white">Mayank Gupta</h1>
+                    <h1 className="text-3xl md:text-5xl font-bold text-white"> {details.username} </h1>
                     <p className="text-lg md:text-xl mt-2">
                         {callState === "calling" && <span className="text-pink-500">Calling...</span>}
                         {callState === "oncall" && <span className="text-green-400">On Call</span>}
