@@ -3,8 +3,11 @@ import SimplePeer from 'simple-peer';
 export class WebRTCManager {
   private peer: any = null;
   private localStream: MediaStream | null = null;
+  private audioElement: HTMLAudioElement
 
-  constructor() {}
+  constructor(audioElement: HTMLAudioElement) {
+    this.audioElement = audioElement;
+  }
 
   async initializeLocalStream(): Promise<MediaStream> {
     this.localStream = await navigator.mediaDevices.getUserMedia({
@@ -25,9 +28,8 @@ export class WebRTCManager {
     });
 
     this.peer.on('stream', (remoteStream) => {
-      const audioElement = document.getElementById('remote-audio') as HTMLAudioElement;
-      if (audioElement) {
-        audioElement.srcObject = remoteStream;
+      if (this.audioElement) {
+        this.audioElement.srcObject = remoteStream;
       }
     });
 
