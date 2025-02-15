@@ -44,7 +44,7 @@ const AudioPlayer = ({ src }: { src: string }) => {
 	};
 
 	return (
-		<div className="w-[312px] h-[126px] bg-[#242424] rounded-[12px] p-4 flex flex-col items-center justify-between">
+		<div className="w-[312px] h-[126px] bg-[#242424] rounded-[12px] p-4 flex flex-col items-center justify-between mt-[0px]">
 			<audio ref={audioRef} src={src} />
 			<div className="flex flex-col items-center w-[100%] mt-[3px]">
 			<input

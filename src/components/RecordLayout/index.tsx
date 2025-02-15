@@ -6,26 +6,26 @@ import AudioPlayer from "@/components/AudioPlayer";
 
 
 const PlayButton = () => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isRecorded, setIsRecorded] = useState(false);
-  const [recordTime, setRecordTime] = useState(0);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isProcessed, setIsProcessed] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null); 
+    const [isRecording, setIsRecording] = useState(false);
+    const [isRecorded, setIsRecorded] = useState(false);
+    const [recordTime, setRecordTime] = useState(0);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [isProcessed, setIsProcessed] = useState(false);
+    const [audioUrl, setAudioUrl] = useState<string | null>(null); 
 
-  const mediaRecorder = useRef<MediaRecorder | null>(null);
-  const chunks = useRef<BlobPart[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const mediaRecorder = useRef<MediaRecorder | null>(null);
+    const chunks = useRef<BlobPart[]>([]);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
 
-  const toggleRecording = async () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  };
+    const toggleRecording = async () => {
+        if (isRecording) {
+        stopRecording();
+        } else {
+        startRecording();
+        }
+    };
 
     const startRecording = async () => {
         try {
