@@ -8,15 +8,21 @@ const AudioPlayer = ({ src }: { src: string }) => {
 	const [duration, setDuration] = useState(0);
 
 	useEffect(() => {
-		if (audioRef.current) {
-			audioRef.current.addEventListener("timeupdate", () => {
-				setCurrentTime(audioRef.current!.currentTime);
-			});
+		const audio = audioRef.current;
+		if (!audio) return;
 
-			audioRef.current.addEventListener("loadedmetadata", () => {
-				setDuration(audioRef.current!.duration);
-			});
-		}
+		const updateTime = () => setCurrentTime(audio.currentTime);
+		const updateDuration = () => {console.log(audio.duration); setDuration(audio.duration)};
+		const handleEnded = () => setIsPlaying(false); 
+		audio.addEventListener("timeupdate", updateTime);
+		audio.addEventListener("loadedmetadata", updateDuration);
+		audio.addEventListener("ended", handleEnded);
+
+		return () => {
+			audio.removeEventListener("timeupdate", updateTime);
+			audio.removeEventListener("loadedmetadata", updateDuration);
+			audio.removeEventListener("ended", handleEnded);
+		};
 	}, []);
 
 	const togglePlay = () => {
@@ -47,34 +53,30 @@ const AudioPlayer = ({ src }: { src: string }) => {
 		<div className="w-[312px] h-[126px] bg-[#242424] rounded-[12px] p-4 flex flex-col items-center justify-between mt-[0px]">
 			<audio ref={audioRef} src={src} />
 			<div className="flex flex-col items-center w-[100%] mt-[3px]">
-			<input
-				type="range"
-				min="0"
-				max={duration}
-				value={currentTime}
-				onChange={handleSeek}
-				className="w-full h-1 appearance-none bg-white outline-none"
-				style={{
-				accentColor: "#3531BC", 
-				}}
-			/>
-			<div className="flex justify-between w-full mt-1">
-				<p className="text-sm text-white">{formatTime(currentTime)}</p>
-				<p className="text-sm text-white">{formatTime(duration - currentTime)}</p>
+				<input
+					type="range"
+					min="0"
+					max={duration}
+					value={currentTime}
+					onChange={handleSeek}
+					className="w-full h-1 appearance-none bg-white outline-none"
+					style={{ accentColor: "#3531BC" }}
+				/>
+				<div className="flex justify-between w-full mt-1">
+					<p className="text-sm text-white">{formatTime(currentTime)}</p>
+					<p className="text-sm text-white">{formatTime(duration - currentTime)}</p>
+				</div>
 			</div>
-		</div>
 
-
-		<button
-			onClick={togglePlay}
-			className="text-white w-[75px] h-[36px] rounded-[50px] font-semibold text-[14px]"
-			style={{
-			background: "linear-gradient(to right, #5527FA 2.7%, #1FB4C4 91.87%, white 172.56%)",
-
-			}}
-		>
-			{isPlaying ? "Pause" : "Play"}
-		</button>
+			<button
+				onClick={togglePlay}
+				className="text-white w-[75px] h-[36px] rounded-[50px] font-semibold text-[14px]"
+				style={{
+					background: "linear-gradient(to right, #5527FA 2.7%, #1FB4C4 91.87%, white 172.56%)",
+				}}
+			>
+				{isPlaying ? "Pause" : "Play"}
+			</button>
 		</div>
 	);
 };
