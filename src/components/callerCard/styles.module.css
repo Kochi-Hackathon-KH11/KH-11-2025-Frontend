@@ -1,0 +1,25 @@
+.caller-card{
+    position: relative;
+    height:60px;
+    width: 360px;
+    border-bottom: 1px solid white;
+    background-color: var(--black-three);
+}
+.caller-card-detail{
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+.caller-card-name{
+    padding: 14px;
+    font-size: 16px;
+}
+.caller-card-button-container{
+    position: absolute;
+    top:0;
+    right:0;
+}
+.caller-card-button-container:hover{
+    cursor: pointer;
+}
+

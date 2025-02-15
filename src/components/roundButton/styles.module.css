@@ -1,0 +1,10 @@
+.round-button{
+    border:1px solid white;
+}
+
+.round-button-icon{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: brown;
+}
