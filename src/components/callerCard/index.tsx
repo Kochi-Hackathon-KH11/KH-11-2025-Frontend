@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import styles from './styles.module.css';
 import RoundButton from "../roundButton";
 
+// get the username via props
 const CallerCard = () => {
     const router = useRouter();
     const [callButtonStatus, setCallButtonStatus] = useState<boolean>(false);

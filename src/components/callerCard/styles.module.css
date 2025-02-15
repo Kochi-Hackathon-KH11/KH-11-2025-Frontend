@@ -16,8 +16,9 @@
 }
 .caller-card-button-container{
     position: absolute;
-    top:0;
-    right:0;
+    top:50%;
+    transform: translateY(-50%);
+    right:14px;
 }
 .caller-card-button-container:hover{
     cursor: pointer;
