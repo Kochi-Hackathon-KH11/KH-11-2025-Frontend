@@ -1,10 +1,11 @@
-"use client";
-import React, { useState } from "react";
-import Button from "@/components/Button"; 
+import React from "react";
 
-const CallSlider = () => {
-  const [toggled, setToggled] = useState(false);
+interface CallSliderProps {
+  toggled: boolean;
+  setToggled: (value: boolean) => void;
+}
 
+const CallSlider: React.FC<CallSliderProps> = ({ toggled, setToggled }) => {
   return (
     <div
       className={`w-40 h-12 flex items-center rounded-full p-1 transition cursor-pointer ${
@@ -13,12 +14,10 @@ const CallSlider = () => {
       onClick={() => setToggled(!toggled)}
     >
       <div
-        className={`transition-transform ${
-          toggled ? "translate-x-24" : "translate-x-0"
+        className={`w-10 h-10 bg-gray-300 rounded-full transition-transform ${
+          toggled ? "translate-x-24 bg-green-800" : "translate-x-0"
         }`}
-      >
-        <Button /> 
-      </div>
+      ></div>
     </div>
   );
 };
