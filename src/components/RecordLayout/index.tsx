@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import AudioPlayer from "@/components/audioPlayer";
+import { processAudioFile } from "@/lib/process-audio";
 
 
 const PlayButton = () => {
@@ -96,13 +97,16 @@ const PlayButton = () => {
     };
 
     const submitRecording = async () => {
-        if (!audioUrl) {
+        if (!chunks.current) {
             console.error("No recorded audio available.");
             return;
         }
     
         setIsAnalyzing(true);
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        // await new Promise((resolve) => setTimeout(resolve, 3000));
+        const audioFile = new File(chunks.current, 'output.wav', { type: 'audio/wav'})
+        const responseUrl = await processAudioFile(audioFile);
+        setAudioUrl(responseUrl)
         setIsAnalyzing(false);
         setIsProcessed(true);
     };
