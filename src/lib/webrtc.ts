@@ -5,7 +5,7 @@ export class WebRTCManager {
   private localStream: MediaStream | null = null;
   private audioElement: HTMLAudioElement
 
-  constructor(audioElement: HTMLAudioElement) {
+  public attachAudioElement(audioElement: HTMLAudioElement) {
     this.audioElement = audioElement;
   }
 

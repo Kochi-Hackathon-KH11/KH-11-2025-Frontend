@@ -9,7 +9,7 @@ import RoundButton from "@/components/roundButton";
 interface CallerPageProps { 
     callState: CallState;
 }
-type CallState = "calling" | "oncall" | "incoming" | "ended";
+export type CallState = "calling" | "oncall" | "incoming" | "ended";
 
 const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
     const [isToggled, setIsToggled] = useState(false);
@@ -145,7 +145,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
     };
 
     return (
-        <div className="h-screen flex flex-col bg-black">
+        <div className="fixed top-0 left-0 w-screen h-screen flex flex-col bg-black">
             <Navbar />
             <div className="flex flex-col h-[650px] justify-between px-4 text-center">
             <div className="flex flex-col items-center mt-[180px]">

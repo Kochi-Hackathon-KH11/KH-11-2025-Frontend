@@ -1,9 +1,11 @@
 import io, { Socket } from 'socket.io-client';
+import { EventEmitter } from 'eventemitter3';
 
 const SIGNALING_SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_URL;
 
-export class Signaling {
+export class Signaling extends EventEmitter {
     private socket: Socket;
+    private _users: { username: string, online: boolean, sid: string }[]
     private onOffer: (data: any) => void;
     private onAnswer: (data: any) => void;
     private onCandidate: (data: any) => void;
@@ -11,7 +13,12 @@ export class Signaling {
     private onAuthError: (message: string) => void;
     private onUsersUpdated: (users: any[]) => void;
 
+    get users() {
+        return this._users;
+    }
+
     constructor() {
+        super()
         this.socket = io(SIGNALING_SERVER_URL, {
             transports: ['websocket'],
             autoConnect: false,
@@ -24,6 +31,11 @@ export class Signaling {
         this.socket.on('answer', this.handleAnswer);
         this.socket.on('candidate', this.handleCandidate);
         this.socket.on('users_updated', this.handleUsersUpdated);
+        this._users = [];
+        this.connect()
+        this.socket.once('ack', () => {
+            this.authenticate("Mayank", "1234");
+        })
     }
 
     // connect to the signaling server
@@ -39,6 +51,13 @@ export class Signaling {
     // Authenticate the user
     authenticate(username: string, password: string): void {
         this.socket.emit('authenticate_user', { username, password });
+        this.socket.once('authenticated', () => {
+            this.socket.emit("get_all_users")
+            this.socket.once("all_users", (data) => {
+                this._users = data;
+                this.emit('users-updated', data)
+            })
+        })
     }
 
     // send WebRTC offer
