@@ -16,6 +16,8 @@ const PlayButton = () => {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<BlobPart[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
 
   const toggleRecording = async () => {
     if (isRecording) {
@@ -57,15 +59,32 @@ const PlayButton = () => {
         console.error("Error accessing microphone:", error);
         }
     };
+    
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file && file.type.startsWith("audio/")) {
+            const fileUrl = URL.createObjectURL(file);
+            console.log("Uploaded file URL:", fileUrl);
+            setAudioUrl(fileUrl);
+            setIsRecorded(true);
+        } else {
+            console.error("Invalid file type. Please upload an audio file.");
+        }
+      };
+
+
+    const triggerFileUpload = () => {
+        fileInputRef.current?.click();
+    };
 
     const stopRecording = () => {
         if (mediaRecorder.current) {
-        mediaRecorder.current.stop();
+            mediaRecorder.current.stop();
         }
         setIsRecording(false);
         if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+            clearInterval(timerRef.current);
+            timerRef.current = null;
         }
     };
 
@@ -104,10 +123,20 @@ const PlayButton = () => {
             <div className="text-white text-lg">
                 {isRecording ? `Recording: ${recordTime}s` : "Tap to Record"}
             </div>
-            <button className="text-white w-[312px] h-[64px] rounded-[50px]" style={{ background: "linear-gradient(to right, #FA27F6, #8885F3, white)" }}>
+            <button
+            className="text-white w-[312px] h-[64px] rounded-[50px]"
+            style={{ background: "linear-gradient(to right, #FA27F6, #8885F3, white)" }}
+            onClick={triggerFileUpload}>
                 Upload Recording
             </button>
-            </>
+            <input
+            type="file"
+            accept="audio/*"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+          />
+        </>
         ) : (
             <div className="flex flex-col items-center gap-4">
                 <button className="w-[300px] h-[300px] flex items-center justify-center rounded-full border-[3px]" onClick={restartRecording}>
