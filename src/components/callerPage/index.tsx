@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navbar";
 import CallSlider from "@/components/callSlider";
 import DeclineButton from "@/components/declineButton";
 import RecordButton from "@/components/recordButton";
