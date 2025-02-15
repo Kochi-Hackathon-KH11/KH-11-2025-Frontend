@@ -21,7 +21,9 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
 
     const mediaRecorder = useRef<MediaRecorder | null>(null);
     const chunks = useRef<BlobPart[]>([]);
+    const fileBlob = useRef<Blob>(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const [buttonState, setButtonState] = useState<"play" | "pause" | "restart">("play");
 
     const startRecording = async () => {
         try {
@@ -36,6 +38,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
 
             mediaRecorder.current.onstop = () => {
                 const recordedBlob = new Blob(chunks.current, { type: "audio/wav" });
+                fileBlob.current = recordedBlob
                 const recordedUrl = URL.createObjectURL(recordedBlob);
                 console.log("Recorded audio URL:", recordedUrl);
 
@@ -58,11 +61,14 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
 
     const toggleRecording = async () => {
         if (isRecording) {
-            stopRecording();
+            await stopRecording();
+            setButtonState("play"); 
         } else {
             await startRecording();
+            setButtonState("pause"); 
         }
     };
+
     
     const stopRecording = () => {
         if (mediaRecorder.current) {
@@ -93,7 +99,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
     
 
     const submitRecording = async () => {
-        if (!audioUrl) {
+        if (!fileBlob.current) {
             console.error("No recorded audio available.");
             return;
         }
@@ -121,7 +127,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
                         <p className="text-lg md:text-xl mt-2 text-green-400">On Call</p>
                         <p className="text-lg md:text-xl mt-2 text-green-400">add time here</p>
                         <div className="mt-20 flex flex-col items-center gap-6 w-full max-w-sm">
-                            {isToggled && <RecordButton onClick={toggleRecording} isRecording={isRecording} />}
+                            {isToggled && <RecordButton onClick={toggleRecording} buttonState={buttonState} />}
                             <CallSlider toggled={isToggled} setToggled={setIsToggled} />
                         </div>
                     </div>

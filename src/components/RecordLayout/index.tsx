@@ -16,6 +16,7 @@ const PlayButton = () => {
 
     const mediaRecorder = useRef<MediaRecorder | null>(null);
     const chunks = useRef<BlobPart[]>([]);
+    const fileBlob = useRef<Blob>(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -40,7 +41,8 @@ const PlayButton = () => {
         };
 
         mediaRecorder.current.onstop = () => {
-            const recordedBlob = new Blob(chunks.current, { type: "audio/wav" });
+            const recordedBlob = new Blob(chunks.current, { type: "audio/webm" });
+            fileBlob.current = recordedBlob
             const recordedUrl = URL.createObjectURL(recordedBlob);
             console.log("Recorded audio URL:", recordedUrl);
             
@@ -97,16 +99,17 @@ const PlayButton = () => {
     };
 
     const submitRecording = async () => {
-        if (!chunks.current) {
+        if (!fileBlob.current) {
             console.error("No recorded audio available.");
             return;
         }
-    
+
         setIsAnalyzing(true);
         // await new Promise((resolve) => setTimeout(resolve, 3000));
-        const audioFile = new File(chunks.current, 'output.wav', { type: 'audio/wav'})
-        const responseUrl = await processAudioFile(audioFile);
-        setAudioUrl(responseUrl)
+        const file = new File([fileBlob.current], 'output.webm', { type: 'audio/webm' });
+        console.log(file);
+        const response = await processAudioFile(file);
+        setAudioUrl(response)
         setIsAnalyzing(false);
         setIsProcessed(true);
     };
@@ -122,7 +125,7 @@ const PlayButton = () => {
                 }`}
                 onClick={toggleRecording}
             >
-                <Image src={isRecording ? "/recording.png" : "/play.png"} alt="Record" width={80} height={80} />
+                <Image src={isRecording ? "/pause.png" : "/play.png"} alt="Record" width={80} height={80} />
             </button>
             <div className="text-white text-lg">
                 {isRecording ? `Recording: ${recordTime}s` : "Tap to Record"}
