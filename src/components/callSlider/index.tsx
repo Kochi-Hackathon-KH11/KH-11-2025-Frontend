@@ -1,4 +1,5 @@
 import React from "react";
+import RoundButton from "@/components/roundButton"; // Adjust the import path if necessary
 
 interface CallSliderProps {
   toggled: boolean;
@@ -8,16 +9,23 @@ interface CallSliderProps {
 const CallSlider: React.FC<CallSliderProps> = ({ toggled, setToggled }) => {
   return (
     <div
-      className={`w-40 h-12 flex items-center rounded-full p-1 transition cursor-pointer ${
+      className={`w-[150px] h-12 flex items-center rounded-full transition cursor-pointer ${
         toggled ? "bg-green-500" : "bg-white border border-gray-300"
       }`}
       onClick={() => setToggled(!toggled)}
     >
       <div
-        className={`w-10 h-10 bg-gray-300 rounded-full transition-transform ${
-          toggled ? "translate-x-24 bg-green-800" : "translate-x-0"
+        className={`transition-transform ${
+          toggled ? "translate-x-[110%]" : "translate-x-[-10%]"
         }`}
-      ></div>
+      >
+        <RoundButton
+          buttonType="activate"
+          dimension={75} 
+          iconDimension={36} 
+          functionToHandle={() => setToggled(!toggled)}
+        />
+      </div>
     </div>
   );
 };

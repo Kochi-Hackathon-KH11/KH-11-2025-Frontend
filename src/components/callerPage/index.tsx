@@ -1,29 +1,63 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import CallSlider from "@/components/callSlider";
-import DeclineButton from "@/components/declineButton";
 import RecordButton from "@/components/recordButton";
+import { processAudioFile } from "@/lib/process-audio";
+import RoundButton from "@/components/roundButton";
 
-interface CallerPageProps {
+interface CallerPageProps { 
     callState: CallState;
 }
-type CallState = "calling" | "oncall" | "recording" | "not-recording" | "ended";
+type CallState = "calling" | "oncall" | "incoming" | "ended";
 
 const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
     const [isToggled, setIsToggled] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const [isRecorded, setIsRecorded] = useState(false);
     const [recordTime, setRecordTime] = useState(0);
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isProcessed, setIsProcessed] = useState(false);
-    const [audioUrl, setAudioUrl] = useState<string | null>(null); 
+    const [audioUrl, setAudioUrl] = useState<string | null>(null);
+    const [callDuration, setCallDuration] = useState(0); 
 
     const mediaRecorder = useRef<MediaRecorder | null>(null);
     const chunks = useRef<BlobPart[]>([]);
     const fileBlob = useRef<Blob>(null);
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const recordTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const callTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const [file, setFile] = useState<File | null>(null);
     const [buttonState, setButtonState] = useState<"play" | "pause" | "restart">("play");
+
+    useEffect(() => {
+        if(!isToggled){
+            restartRecording();
+        }
+    })
+    
+    useEffect(() => {
+        if (callState === "oncall") {
+            setCallDuration(0);
+            callTimerRef.current = setInterval(() => {
+                setCallDuration((prev) => prev + 1);
+            }, 1000);
+        } else if (callState === "ended" && callTimerRef.current) {
+            clearInterval(callTimerRef.current);
+            callTimerRef.current = null;
+        }
+
+        return () => {
+            if (callTimerRef.current) {
+                clearInterval(callTimerRef.current);
+            }
+        };
+    }, [callState]);
+
+
+    useEffect(() => {
+        if (file) {
+            submitRecording()
+        }
+    }, [file]);
 
     const startRecording = async () => {
         try {
@@ -37,13 +71,9 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
             };
 
             mediaRecorder.current.onstop = () => {
-                const recordedBlob = new Blob(chunks.current, { type: "audio/wav" });
-                fileBlob.current = recordedBlob
-                const recordedUrl = URL.createObjectURL(recordedBlob);
-                console.log("Recorded audio URL:", recordedUrl);
-
-                setAudioUrl(recordedUrl);
-                chunks.current = [];
+                const recordedBlob = new Blob(chunks.current, { type: "audio/webm" });
+                setFile(new File([recordedBlob], "output.webm", { type: "audio/webm" }));
+                console.log(recordedBlob);
                 setIsRecorded(true);
             };
 
@@ -51,7 +81,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
             setIsRecording(true);
             setRecordTime(0);
 
-            timerRef.current = setInterval(() => {
+            recordTimerRef.current = setInterval(() => {
                 setRecordTime((prev) => prev + 1);
             }, 1000);
         } catch (error) {
@@ -62,88 +92,98 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState }) => {
     const toggleRecording = async () => {
         if (isRecording) {
             await stopRecording();
-            setButtonState("play"); 
+            setButtonState("play");
         } else {
             await startRecording();
-            setButtonState("pause"); 
+            setButtonState("pause");
         }
     };
 
-    
     const stopRecording = () => {
         if (mediaRecorder.current) {
-            return new Promise<void>((resolve) => {
-                mediaRecorder.current!.onstop = () => {
-                    const recordedBlob = new Blob(chunks.current, { type: "audio/wav" });
-                    const recordedUrl = URL.createObjectURL(recordedBlob);
-                    console.log("Recorded audio URL:", recordedUrl);
-                    
-                    setAudioUrl(recordedUrl);
-                    chunks.current = [];
-                    setIsRecorded(true);
-                    resolve();
-                };
-                mediaRecorder.current!.stop();
-            });
+            mediaRecorder.current.stop();
         }
-    };
-    
-    const handleRecordButtonClick = async () => {
-        if (isRecording) {
-            await stopRecording();
-            await submitRecording();
-        } else {
-            await startRecording();
+        setIsRecording(false);
+        if (recordTimerRef.current) {
+            clearInterval(recordTimerRef.current);
+            recordTimerRef.current = null;
         }
+        // setTimeout(() => {
+        //     if (file) {
+        //         submitRecording();
+        //     } else {
+        //         console.error("File not available for submission");
+        //     }
+        // }, 500);
     };
-    
 
     const submitRecording = async () => {
-        if (!fileBlob.current) {
+        if (!file) {
             console.error("No recorded audio available.");
             return;
         }
-
-        setIsAnalyzing(true);
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        setIsAnalyzing(false);
+        console.log(file);
+        const response = await processAudioFile(file);
+        setAudioUrl(response);
         setIsProcessed(true);
+    };
+
+    const restartRecording = () => {
+        setIsRecorded(false);
+        setIsProcessed(false);
+        setAudioUrl(null);
+        setRecordTime(0);
+        setButtonState('play')
+        mediaRecorder.current = null;
+        setFile(null)
+    };
+
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
     };
 
     return (
         <div className="h-screen flex flex-col bg-black">
             <Navbar />
-            <div className="flex flex-col flex-grow items-center justify-center px-4 text-center">
-                <h1 className="text-3xl md:text-5xl font-bold text-white">Mayank Gupta</h1>
-
-                {callState === "calling" && (
-                    <p className="text-lg md:text-xl mt-2 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-pink-300">
-                        Calling...
+            <div className="flex flex-col h-[650px] justify-between px-4 text-center">
+            <div className="flex flex-col items-center mt-[180px]">
+                    <h1 className="text-3xl md:text-5xl font-bold text-white">Mayank Gupta</h1>
+                    <p className="text-lg md:text-xl mt-2">
+                        {callState === "calling" && <span className="text-pink-500">Calling...</span>}
+                        {callState === "oncall" && <span className="text-green-400">On Call</span>}
+                        {callState === "incoming" && <span className="text-red-400">Incoming...</span>}
+                        {callState === "ended" && <span className="text-gray-400">Call Ended</span>}
                     </p>
-                )}
-
-                {callState === "oncall" && (
-                    <div>
-                        <p className="text-lg md:text-xl mt-2 text-green-400">On Call</p>
-                        <p className="text-lg md:text-xl mt-2 text-green-400">add time here</p>
-                        <div className="mt-20 flex flex-col items-center gap-6 w-full max-w-sm">
-                            {isToggled && <RecordButton onClick={toggleRecording} buttonState={buttonState} />}
-                            <CallSlider toggled={isToggled} setToggled={setIsToggled} />
-                        </div>
+                    {(callState === "oncall" || callState === "ended") && (
+                        <p className="text-lg md:text-xl mt-2 text-white">
+                            Duration: {formatTime(callDuration)}
+                        </p>
+                    )}
+                </div>
+                {callState === "oncall" && isToggled && (
+                    <div className="absolute top-[360px] left-1/2 transform -translate-x-1/2">
+                        <RecordButton onClick={toggleRecording} buttonState={buttonState} />
                     </div>
                 )}
-
-                {callState === "recording" && (
-                    <p className="text-lg md:text-xl mt-2 text-red-400">Recording...</p>
-                )}
-
-                {callState === "not-recording" && (
-                    <p className="text-lg md:text-xl mt-2 text-yellow-400">On Call (Not Recording)</p>
-                )}
-
-                {callState === "ended" && (
-                    <p className="text-lg md:text-xl mt-2 text-gray-400">Call Ended</p>
-                )}
+                <div className="flex flex-col items-center justify-center fixed bottom-8 w-full">
+                    {(callState == "calling") && (
+                        <RoundButton buttonType="reject" dimension={75} iconDimension={36} functionToHandle={() => console.log("Call button clicked")}/>
+                    )}
+                    {(callState == "incoming") && (
+                        <div className="flex gap-[120px]"> 
+                            <RoundButton buttonType="call" dimension={75} iconDimension={36} functionToHandle={() => console.log("Call button clicked")}/>
+                            <RoundButton buttonType="reject" dimension={75} iconDimension={50} functionToHandle={() => console.log("Call button clicked")}/>
+                        </div>
+                    )}
+                    {(callState == "oncall") && (
+                        <div className="flex items-center justify-center gap-[40px]">
+                            <CallSlider toggled={isToggled} setToggled={setIsToggled} />
+                            <RoundButton buttonType="end" dimension={75} iconDimension={36} functionToHandle={() => console.log("Call button clicked")}/>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

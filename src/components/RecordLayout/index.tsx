@@ -16,7 +16,6 @@ const PlayButton = () => {
 
     const mediaRecorder = useRef<MediaRecorder | null>(null);
     const chunks = useRef<BlobPart[]>([]);
-    const fileBlob = useRef<Blob>(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -46,7 +45,7 @@ const PlayButton = () => {
         mediaRecorder.current.onstop = () => {
             const recordedBlob = new Blob(chunks.current, { type: "audio/webm" });
             // fileBlob.current = recordedBlob
-            setFile(new File([recordedBlob], 'output.wav', { type: 'audio/wav'}))
+            setFile(new File([recordedBlob], 'output.webm', { type: 'audio/webm'}))
             
             setIsRecorded(true);
         };

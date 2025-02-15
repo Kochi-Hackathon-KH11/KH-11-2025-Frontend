@@ -21,6 +21,8 @@ const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
  * )
  */
 export const processAudioFile = async (file: File): Promise<string> => {
+    if (!file)
+        return "";
     const formData = new FormData()
     formData.append('audio-file', file)
 
