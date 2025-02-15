@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import AudioPlayer from "@/components/AudioPlayer";
+import AudioPlayer from "@/components/audioPlayer";
 
 
 const PlayButton = () => {
