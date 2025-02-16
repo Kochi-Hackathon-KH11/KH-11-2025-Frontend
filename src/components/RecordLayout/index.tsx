@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
-import AudioPlayer from "@/components/AudioPlayer";
+import AudioPlayer from "@/components/audioPlayer";
+import { processAudioFile } from "@/lib/process-audio";
 
 
 const PlayButton = () => {
@@ -19,11 +20,14 @@ const PlayButton = () => {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
 
+    const [file, setFile] = useState<File | null>(null)
+
+
     const toggleRecording = async () => {
         if (isRecording) {
-        stopRecording();
+            stopRecording();
         } else {
-        startRecording();
+            startRecording();
         }
     };
 
@@ -39,12 +43,10 @@ const PlayButton = () => {
         };
 
         mediaRecorder.current.onstop = () => {
-            const recordedBlob = new Blob(chunks.current, { type: "audio/wav" });
-            const recordedUrl = URL.createObjectURL(recordedBlob);
-            console.log("Recorded audio URL:", recordedUrl);
+            const recordedBlob = new Blob(chunks.current, { type: "audio/webm" });
+            // fileBlob.current = recordedBlob
+            setFile(new File([recordedBlob], 'output.webm', { type: 'audio/webm'}))
             
-            setAudioUrl(recordedUrl);
-            chunks.current = [];
             setIsRecorded(true);
         };
 
@@ -63,9 +65,8 @@ const PlayButton = () => {
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file && file.type.startsWith("audio/")) {
-            const fileUrl = URL.createObjectURL(file);
-            console.log("Uploaded file URL:", fileUrl);
-            setAudioUrl(fileUrl);
+            console.log(file.name)
+            setFile(file)
             setIsRecorded(true);
         } else {
             console.error("Invalid file type. Please upload an audio file.");
@@ -96,13 +97,19 @@ const PlayButton = () => {
     };
 
     const submitRecording = async () => {
-        if (!audioUrl) {
+        // if (!fileBlob.current) {
+        //     console.error("No recorded audio available.");
+        //     return;
+        // }
+        if (!file) {
             console.error("No recorded audio available.");
             return;
         }
-    
+
         setIsAnalyzing(true);
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        console.log(file);
+        const response = await processAudioFile(file);
+        setAudioUrl(response)
         setIsAnalyzing(false);
         setIsProcessed(true);
     };
@@ -118,7 +125,7 @@ const PlayButton = () => {
                 }`}
                 onClick={toggleRecording}
             >
-                <Image src={isRecording ? "/recording.png" : "/play.png"} alt="Record" width={80} height={80} />
+                <Image src={isRecording ? "/pause.png" : "/play.png"} alt="Record" width={80} height={80} />
             </button>
             <div className="text-white text-lg">
                 {isRecording ? `Recording: ${recordTime}s` : "Tap to Record"}
