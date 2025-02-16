@@ -7,6 +7,7 @@ import { createStreamFromAudioUrl, processAudioFile } from "@/lib/process-audio"
 import RoundButton from "@/components/roundButton";
 import { useSocketContext } from "@/hooks/useSocketContext";
 import { WebRTCManager } from "@/lib/webrtc";
+import AudioVisualizer from "@/components/audioVisualizer";
 
 interface CallerPageProps {
     callState: CallState;
@@ -200,7 +201,9 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
 
                 <div className="flex flex-col items-center justify-center fixed bottom-8 w-full">
                     {(callState == "calling") && (
-                        <RoundButton buttonType="reject" dimension={75} iconDimension={36} functionToHandle={() => console.log("Call button clicked")} />
+                        <div>
+                            <RoundButton buttonType="reject" dimension={75} iconDimension={36} functionToHandle={callEndedHandler}/>
+                        </div>
                     )}
                     {(callState == "incoming") && (
                         <div className="flex gap-[120px]">

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import AudioPlayer from "@/components/AudioPlayer";
+import AudioPlayer from "@/components/audioPlayer";
 import { processAudioFile } from "@/lib/process-audio";
+import AudioVisualizer from "@/components/audioVisualizer";
+// import {v4 as uuidv4} from 'uuid';
 
-
-const PlayButton = () => {
+const recordLayout = () => {
     const [isRecording, setIsRecording] = useState(false);
     const [isRecorded, setIsRecorded] = useState(false);
     const [recordTime, setRecordTime] = useState(0);
@@ -38,15 +39,16 @@ const PlayButton = () => {
 
         mediaRecorder.current.ondataavailable = (event) => {
             if (event.data.size > 0) {
-            chunks.current.push(event.data);
+                chunks.current.push(event.data);
             }
         };
 
         mediaRecorder.current.onstop = () => {
             const recordedBlob = new Blob(chunks.current, { type: "audio/webm" });
             // fileBlob.current = recordedBlob
-            setFile(new File([recordedBlob], 'output.webm', { type: 'audio/webm'}))
-            
+            // setFile(new File([recordedBlob], `${uuidv4()}.webm`, { type: 'audio/webm'}))
+            setFile(new File([recordedBlob], "output.webm", { type: 'audio/webm'}))
+            chunks.current = []
             setIsRecorded(true);
         };
 
@@ -93,14 +95,10 @@ const PlayButton = () => {
         setIsRecorded(false);
         setIsProcessed(false);
         setAudioUrl(null);
-        setRecordTime(0);
+        setRecordTime(0);  
     };
 
     const submitRecording = async () => {
-        // if (!fileBlob.current) {
-        //     console.error("No recorded audio available.");
-        //     return;
-        // }
         if (!file) {
             console.error("No recorded audio available.");
             return;
@@ -109,6 +107,7 @@ const PlayButton = () => {
         setIsAnalyzing(true);
         console.log(file);
         const response = await processAudioFile(file);
+        setFile(null);
         setAudioUrl(response)
         setIsAnalyzing(false);
         setIsProcessed(true);
@@ -119,31 +118,27 @@ const PlayButton = () => {
         <div className="flex flex-col items-center gap-4">
         {!isRecorded ? (
             <>
-            <button
-                className={`w-[300px] h-[300px] flex items-center justify-center rounded-full border-[3px] transition-all ${
-                isRecording ? "border-red-500 bg-red-700" : "border-white bg-transparent"
-                }`}
-                onClick={toggleRecording}
-            >
-                <Image src={isRecording ? "/pause.png" : "/play.png"} alt="Record" width={80} height={80} />
-            </button>
-            <div className="text-white text-lg">
-                {isRecording ? `Recording: ${recordTime}s` : "Tap to Record"}
-            </div>
-            <button
-            className="text-white w-[312px] h-[64px] rounded-[50px]"
-            style={{ background: "linear-gradient(to right, #FA27F6, #8885F3, white)" }}
-            onClick={triggerFileUpload}>
-                Upload Recording
-            </button>
-            <input
-            type="file"
-            accept="audio/*"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            style={{ display: "none" }}
-          />
-        </>
+                <div className = "">
+                    <button
+                        className={`w-[300px] h-[300px] flex items-center justify-center rounded-full border-[3px] transition-all `} onClick={toggleRecording}>
+                        <AudioVisualizer isRecording={isRecording} />
+                        <Image src={isRecording ? "/pause.png" : "/play.png"} alt="Record" width={80} height={80} />
+                    </button>
+                </div>
+                <div className="text-white text-lg">
+                    {isRecording ? `Recording: ${recordTime}s` : "Tap to Record"}
+                </div>
+                <button className="text-white w-[312px] h-[64px] rounded-[50px]" style={{ background: "linear-gradient(to right, #FA27F6, #8885F3, white)" }} onClick={triggerFileUpload}>
+                    Upload Recording
+                </button>
+                <input
+                    type="file"
+                    accept="audio/*"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    style={{ display: "none" }}
+                />
+            </>
         ) : (
             <div className="flex flex-col items-center gap-4">
                 <button className="w-[300px] h-[300px] flex items-center justify-center rounded-full border-[3px]" onClick={restartRecording}>
@@ -201,4 +196,4 @@ const PlayButton = () => {
     );
     };
 
-export default PlayButton;
+export default recordLayout;

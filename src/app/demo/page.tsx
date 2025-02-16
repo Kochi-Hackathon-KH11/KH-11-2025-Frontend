@@ -1,4 +1,4 @@
-import RecordLayout from "@/components/RecordLayout"
+import RecordLayout from "@/components/recordLayout"
 export default function Home() {
   return (
     <div className="flex justify-center items-center h-screen">
