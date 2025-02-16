@@ -35,15 +35,19 @@ const Page = () => {
         router.push('/');
     }
 
-    const handleGoSignUp = () => {
-        router.push('signup')
+    const handleGoLogin = () => {
+        router.push('login');
     }
 
     return (
         <div className={styles['login']}>
             <form onSubmit={submitHandler} className={styles['login-div']}>
                 <div className={styles['input-container']}>
-                    <div className={styles['form-title']}> Login</div>
+                    <div className={styles['form-title']}> Sign up</div>
+                    <div className={styles['form-input-container']}>
+                        <div>Email <span className={styles['must']}>*</span></div>
+                        <input name="username" type="text" value={formData.username} onChange={changeHandler} />
+                    </div>
                     <div className={styles['form-input-container']}>
                         <div>Username <span className={styles['must']}>*</span></div>
                         <input name="username" type="text" value={formData.username} onChange={changeHandler} />
@@ -54,17 +58,15 @@ const Page = () => {
                     </div>
                 </div>
                 <div className={styles['login-button-container']}>
-                    <button type="submit" className={styles['login-button']}> Login </button>
+                    <button type="submit" className={styles['login-button']}> Sign up </button>
                     {/* <div className={styles['horizontal-bar']}></div> */}
-                    <div className={styles['change-to-signup']} onClick={handleGoSignUp}>Sign Up</div>
+                    <div className={styles['change-to-signup']} onClick={handleGoLogin}>Login</div>
                 </div>
                 <div className={styles['go-back']} onClick={handleGoBack}>go back</div>
             </form>
-
-            <div className={styles['lower-wave']}>
-                <img src='/hero-lower-wave.svg' alt = 'wave'></img>
+            <div className={styles['upper-wave']}>
+                <img src='/hero-upper-wave.svg' alt = 'wave'></img>
             </div>
-
         </div>
     )
 }

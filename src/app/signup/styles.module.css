@@ -1,0 +1,91 @@
+.login{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100dvh;
+    overflow: hidden;
+    /* background-color: aqua; */
+}
+
+.login-div{
+    z-index: 3;
+    position: relative;
+    height: 400px;
+    width: 320px;
+    background: rgba(0, 0, 0, 0.10);
+    backdrop-filter: blur(7.5px);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    padding-block: 12px;
+    /* justify-content: space-between; */
+}
+
+.form-title{
+    font-weight: 700;
+    text-align: center;
+}
+
+.login-button-container{
+    margin-top: 24px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.login-button{
+    font-size: 12px;
+    /* border: 1px solid white; */
+    height: 36px;
+    padding-inline: 36px;
+    border-radius: 36px;
+    background: linear-gradient(90deg, #78B3CD 0%, #482C9D 50%, #8B1A9C 100%);
+}
+
+.change-to-signup{
+    text-decoration: underline;
+    font-size: 12px;
+}
+
+.change-to-signup:hover{
+    cursor: pointer;
+    color: #78B3CD;
+}
+
+.form-input-container{
+    padding: 8px 16px;
+}
+
+.form-input-container input{
+    background-color: rgba(255,255,255,0.2);
+    width:100%;
+    border: 4px;
+    padding: 4px;
+}
+
+.must{
+    color: red;
+}
+
+.go-back{
+    font-size: 12px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 8px 16px;
+}
+.go-back:hover{
+    cursor: pointer;
+    text-decoration: underline;
+    color:#78B3CD;
+}
+
+.upper-wave{
+    position: absolute;
+    bottom: -20%;
+    left:-5%;
+}

@@ -9,7 +9,7 @@ export default function Features (){
             description: "Modulates speech fluency in real-time, ensuring smooth and natural communication."
         },
         {
-            imagePath : '/feature-two.svg',
+            imagePath : '/feature-two.png',
             title:"Synthetic Output",
             description: "The tool uses an openly available voice model to provide clear and consistent speech output."
         },
