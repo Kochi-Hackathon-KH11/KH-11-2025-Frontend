@@ -82,6 +82,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
             mediaRecorder.current.onstop = () => {
                 const recordedBlob = new Blob(chunks.current, { type: "audio/webm" });
                 setFile(new File([recordedBlob], "output.webm", { type: "audio/webm" }));
+                chunks.current = [];
                 console.log(recordedBlob);
                 setIsRecorded(true);
             };
@@ -133,6 +134,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
         }
         console.log(file);
         const response = await processAudioFile(file);
+        setFile(null)
         setAudioUrl(response);
 
         try {
