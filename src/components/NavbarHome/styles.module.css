@@ -6,6 +6,8 @@
     align-items: center;
     padding-inline: 12px;
     position: fixed;
+    top:0;
+    left:0;
     background: rgba(0, 0, 0, 0.10);
     backdrop-filter: blur(7.5px);
     z-index: 5;
