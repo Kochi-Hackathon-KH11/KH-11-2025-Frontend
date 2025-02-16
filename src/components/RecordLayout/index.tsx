@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import AudioPlayer from "@/components/audioPlayer";
+import AudioPlayer from "@/components/AudioPlayer";
 import { processAudioFile } from "@/lib/process-audio";
 
 

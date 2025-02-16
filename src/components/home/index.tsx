@@ -3,7 +3,7 @@ import Footer from "../footer";
 import Future from "../future";
 import GetStarted from "../getStarted";
 import Hero from "../hero";
-import Navbar from "../navbar";
+import Navbar from "../NavbarHome";
 import Problem from "../problem";
 
 export default function HomeSection () {
