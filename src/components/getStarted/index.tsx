@@ -1,5 +1,4 @@
 import styles from './styles.module.css'
-import { FC } from 'react'
 
 export default function GetStarted () {
     return(

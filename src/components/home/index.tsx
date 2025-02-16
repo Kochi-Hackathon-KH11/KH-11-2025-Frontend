@@ -1,4 +1,3 @@
-import FeatureCards from "../featureCard";
 import Features from "../features";
 import Footer from "../footer";
 import Future from "../future";
