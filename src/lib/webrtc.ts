@@ -15,9 +15,9 @@ export class WebRTCManager {
     this.localStream.getTracks().forEach(track => track.enabled = false);
   }
 
-  public resumeStream() {
-    this.localStream.getTracks().forEach(track => track.enabled = false);
-  }
+  // public resumeStream() {
+  //   this.localStream.getTracks().forEach(track => track.enabled = false);
+  // }
 
   async initializeLocalStream(): Promise<MediaStream> {
     this.localStream = await navigator.mediaDevices.getUserMedia({
@@ -55,6 +55,28 @@ export class WebRTCManager {
   destroy(): void {
     this.peer?.destroy();
     this.localStream?.getTracks().forEach((track) => track.stop());
+  }
+
+  public replaceTrack(newTrack: MediaStreamTrack | null, type: 'local' | 'processed'): void {
+    const sender = this.peer?._pc?.getSenders().find((s) => s.track?.kind === 'audio');
+    if (sender && newTrack) {
+      sender.replaceTrack(newTrack);
+    }
+
+    if (type == 'processed') {
+      newTrack.onended = () => {
+        this.replaceTrack(this.getLocalTrack(), 'local')
+      }
+    }
+  }
+
+  public getLocalTrack(): MediaStreamTrack | null {
+    return this.localStream?.getAudioTracks()[0] || null;
+  }
+
+  // Fix the resumeStream method
+  public resumeStream() {
+    this.localStream?.getTracks().forEach(track => track.enabled = true);
   }
 
 }

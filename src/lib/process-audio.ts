@@ -39,3 +39,20 @@ export const processAudioFile = async (file: File): Promise<string> => {
     return audioUrl;
 }
 
+
+export const createStreamFromAudioUrl = async (url: string): Promise<MediaStream> => {
+    const audioContext = new AudioContext();
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+    const source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.loop = false;
+
+    const destination = audioContext.createMediaStreamDestination();
+    source.connect(destination);
+    source.start();
+
+    return destination.stream;
+};

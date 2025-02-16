@@ -3,12 +3,12 @@ import { useState, useRef, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import CallSlider from "@/components/callSlider";
 import RecordButton from "@/components/recordButton";
-import { processAudioFile } from "@/lib/process-audio";
+import { createStreamFromAudioUrl, processAudioFile } from "@/lib/process-audio";
 import RoundButton from "@/components/roundButton";
 import { useSocketContext } from "@/hooks/useSocketContext";
 import { WebRTCManager } from "@/lib/webrtc";
 
-interface CallerPageProps { 
+interface CallerPageProps {
     callState: CallState;
     details: { username: string, sid: string, offer?: any },
 }
@@ -21,7 +21,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
     const [recordTime, setRecordTime] = useState(0);
     const [isProcessed, setIsProcessed] = useState(false);
     const [audioUrl, setAudioUrl] = useState<string | null>(null);
-    const [callDuration, setCallDuration] = useState(0); 
+    const [callDuration, setCallDuration] = useState(0);
 
     const mediaRecorder = useRef<MediaRecorder | null>(null);
     const chunks = useRef<BlobPart[]>([]);
@@ -34,11 +34,13 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
 
 
     useEffect(() => {
-        if(!isToggled){
+        if (!isToggled) {
+            const originalTrack = webRtcRef.current.getLocalTrack();
+            webRtcRef.current.replaceTrack(originalTrack, 'local');
             restartRecording();
         }
     }, [isToggled])
-    
+
     useEffect(() => {
         if (callState === "oncall") {
             setCallDuration(0);
@@ -131,6 +133,14 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
         console.log(file);
         const response = await processAudioFile(file);
         setAudioUrl(response);
+
+        try {
+            const processedStream = await createStreamFromAudioUrl(response);
+            const processedTrack = processedStream.getAudioTracks()[0];
+            webRtcRef.current.replaceTrack(processedTrack, 'processed');
+        } catch (error) {
+            console.error("Error creating stream from processed audio:", error);
+        }
         setIsProcessed(true);
     };
 
@@ -149,13 +159,13 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
         const secs = seconds % 60;
         return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
     };
-    
+
     const { socketRef, webRtcRef, acceptOffer, setCallState, audioRef } = useSocketContext()
 
     const callEndedHandler = () => {
         setCallState('ended');
         socketRef.current.endCall(details.sid)
-        
+
         webRtcRef.current.destroy();
         webRtcRef.current = new WebRTCManager();
         setTimeout(() => {
@@ -166,7 +176,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
         <div className="fixed top-0 left-0 w-screen h-screen flex flex-col bg-black">
             <Navbar />
             <div className="flex flex-col h-[650px] justify-between px-4 text-center">
-            <div className="flex flex-col items-center mt-[180px]">
+                <div className="flex flex-col items-center mt-[180px]">
                     <h1 className="text-3xl md:text-5xl font-bold text-white"> {details.username} </h1>
                     <p className="text-lg md:text-xl mt-2">
                         {callState === "calling" && <span className="text-pink-500">Calling...</span>}
@@ -182,30 +192,30 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
                 </div>
                 {callState === "oncall" && isToggled && (
                     <div className="absolute top-[360px] left-1/2 transform -translate-x-1/2">
-                        <RecordButton onClick={toggleRecording} buttonState={buttonState}/>
+                        <RecordButton onClick={toggleRecording} buttonState={buttonState} />
                     </div>
                 )}
-                
+
                 <audio ref={audioRef} autoPlay />
 
                 <div className="flex flex-col items-center justify-center fixed bottom-8 w-full">
                     {(callState == "calling") && (
-                        <RoundButton buttonType="reject" dimension={75} iconDimension={36} functionToHandle={() => console.log("Call button clicked")}/>
+                        <RoundButton buttonType="reject" dimension={75} iconDimension={36} functionToHandle={() => console.log("Call button clicked")} />
                     )}
                     {(callState == "incoming") && (
-                        <div className="flex gap-[120px]"> 
+                        <div className="flex gap-[120px]">
                             <RoundButton buttonType="call" dimension={75} iconDimension={36} functionToHandle={async () => {
                                 console.log("clicked accept");
                                 await acceptOffer(details.sid, details.offer);
                                 setCallState('oncall');
-                            }}/>
-                            <RoundButton buttonType="reject" dimension={75} iconDimension={50} functionToHandle={callEndedHandler}/>
+                            }} />
+                            <RoundButton buttonType="reject" dimension={75} iconDimension={50} functionToHandle={callEndedHandler} />
                         </div>
                     )}
                     {(callState == "oncall") && (
                         <div className="flex items-center justify-center gap-[40px]">
                             <CallSlider toggled={isToggled} setToggled={setIsToggled} />
-                            <RoundButton buttonType="end" dimension={75} iconDimension={36} functionToHandle={callEndedHandler}/>
+                            <RoundButton buttonType="end" dimension={75} iconDimension={36} functionToHandle={callEndedHandler} />
                         </div>
                     )}
                 </div>
