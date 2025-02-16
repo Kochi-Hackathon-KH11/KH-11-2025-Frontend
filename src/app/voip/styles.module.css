@@ -1,0 +1,29 @@
+.voip{
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-list-title{
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    gap: 6px
+}
+
+.online{
+    height: 16px;
+    width:16px;
+    background-color: #27FA46;
+    border-radius: 24px;
+}
+
+.user-list{
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}

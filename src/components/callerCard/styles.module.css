@@ -2,7 +2,7 @@
     position: relative;
     height:60px;
     width: 360px;
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid rgba(255,255,255,0.25);
     background-color: var(--black-three);
 }
 .caller-card-detail{

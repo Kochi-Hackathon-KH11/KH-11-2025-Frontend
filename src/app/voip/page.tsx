@@ -5,6 +5,7 @@ import { useSocketContext } from "@/hooks/useSocketContext";
 import { Signaling } from "@/lib/signaling";
 import { WebRTCManager } from "@/lib/webrtc";
 import { useEffect, useRef, useState } from "react";
+import styles from './styles.module.css'
 
 export default function Page() {
 
@@ -56,16 +57,26 @@ export default function Page() {
     }, [socketRef.current]);
 
     return (
-        <>
-            {
-                users.map((data, index) => (
-                    <CallerCard 
-                        key={index} 
-                        {...data}
-                        offerHandler={offerHandler}
-                     />
-                ))
-            }
+        <div className={styles['voip']}>
+            <div className={styles['user-list-container']}>
+                <div className={styles['user-list-title']}>
+                    <div className={styles['online']}></div> 
+                    <div className={styles['user-title']}>Online Users</div>
+                </div>
+                <div  className={styles['user-list']}>
+                    {   
+                        users.filter(user => user.online).map((data, index) => (
+                            <CallerCard 
+                                key={index} 
+                                {...data}
+                                offerHandler={offerHandler}
+                            />
+                        ))
+                    }
+                </div>
+
+            </div>
+            
 
             {
                 callState && (
@@ -75,6 +86,6 @@ export default function Page() {
                     />
                 )
             }
-        </>
+        </div>
     )
 }
