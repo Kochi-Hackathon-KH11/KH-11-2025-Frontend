@@ -26,9 +26,15 @@ const Page = () => {
 
     const submitHandler: FormEventHandler = async (e) => {
         e.preventDefault();
-        const jwt = await loginUser(formData.username, formData.password);
-        console.log(jwt)
-        localStorage.setItem('token', jwt);
+        try {
+            const jwt = await loginUser(formData.username, formData.password);
+            localStorage.setItem('token', jwt);
+
+            router.push('/voip');
+        }
+        catch (error) {
+            console.error(error);
+        }
     }
 
     const handleGoBack = () => {
@@ -62,7 +68,7 @@ const Page = () => {
             </form>
 
             <div className={styles['lower-wave']}>
-                <img src='/hero-lower-wave.svg' alt = 'wave'></img>
+                <img src='/hero-lower-wave.svg' alt='wave'></img>
             </div>
 
         </div>

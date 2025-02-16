@@ -8,9 +8,11 @@ import { ChangeEventHandler, EventHandler, FormEventHandler, useState } from "re
 const Page = () => {
     const router = useRouter();
     const [formData, setFormData] = useState<{
+        email: string,
         username: string,
         password: string,
     }>({
+        email: "",
         username: "",
         password: "",
     })
@@ -26,9 +28,14 @@ const Page = () => {
 
     const submitHandler: FormEventHandler = async (e) => {
         e.preventDefault();
-        const jwt = await loginUser(formData.username, formData.password);
-        console.log(jwt)
-        localStorage.setItem('token', jwt);
+        try {
+            const jwt = await loginUser(formData.username, formData.password);
+            localStorage.setItem('token', jwt);
+            router.push('/voip');
+        }
+        catch (error) {
+            console.error(error);
+        }
     }
 
     const handleGoBack = () => {
@@ -46,7 +53,7 @@ const Page = () => {
                     <div className={styles['form-title']}> Sign up</div>
                     <div className={styles['form-input-container']}>
                         <div>Email <span className={styles['must']}>*</span></div>
-                        <input name="username" type="text" value={formData.username} onChange={changeHandler} />
+                        <input name="email" type="text" value={formData.email} onChange={changeHandler} />
                     </div>
                     <div className={styles['form-input-container']}>
                         <div>Username <span className={styles['must']}>*</span></div>
@@ -65,7 +72,7 @@ const Page = () => {
                 <div className={styles['go-back']} onClick={handleGoBack}>go back</div>
             </form>
             <div className={styles['upper-wave']}>
-                <img src='/hero-upper-wave.svg' alt = 'wave'></img>
+                <img src='/hero-upper-wave.svg' alt='wave'></img>
             </div>
         </div>
     )

@@ -9,3 +9,11 @@ export const loginUser = async (username: string, password: string) => {
 
     return response.data.access;
 }
+
+export const registerUser = async (username: string, email: string, password: string) => {
+    const response = await axios.post(`${backendUrl}/auth/register/`, {
+        username, email, password,
+    });
+
+    return response.data.access;
+}
