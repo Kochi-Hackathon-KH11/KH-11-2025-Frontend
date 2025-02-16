@@ -5,7 +5,7 @@ interface RecordButtonProps {
     buttonState: "play" | "pause" | "restart" | "record";
 }
 
-const RecordButton: React.FC<RecordButtonProps> = ({ onClick, buttonState }) => {
+const RecordButton: React.FC<RecordButtonProps> = ({ onClick, buttonState}) => {
     const imageSrc = {
         play: "/play.png",
         pause: "/pause.png",

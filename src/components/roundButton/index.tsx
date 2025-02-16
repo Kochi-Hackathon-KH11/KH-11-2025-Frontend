@@ -10,7 +10,7 @@ interface RoundButtonProps {
     buttonType: 'call' | 'accept' | 'reject' | 'end' | 'activate',
     dimension: number,
     iconDimension: number,
-    functionToHandle: () => void,
+    functionToHandle: (...args: any[]) => void,
 }
 
 const buttonStyles = {

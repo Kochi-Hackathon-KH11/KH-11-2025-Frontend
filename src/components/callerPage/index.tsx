@@ -5,10 +5,12 @@ import CallSlider from "@/components/callSlider";
 import RecordButton from "@/components/recordButton";
 import { processAudioFile } from "@/lib/process-audio";
 import RoundButton from "@/components/roundButton";
+import { useSocketContext } from "@/hooks/useSocketContext";
+import { WebRTCManager } from "@/lib/webrtc";
 
 interface CallerPageProps { 
     callState: CallState;
-    details: { username: string, sid: string, }
+    details: { username: string, sid: string, offer?: any },
 }
 export type CallState = "calling" | "oncall" | "incoming" | "ended";
 
@@ -29,11 +31,13 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
     const [file, setFile] = useState<File | null>(null);
     const [buttonState, setButtonState] = useState<"play" | "pause" | "restart">("play");
 
+
+
     useEffect(() => {
         if(!isToggled){
             restartRecording();
         }
-    })
+    }, [isToggled])
     
     useEffect(() => {
         if (callState === "oncall") {
@@ -59,6 +63,7 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
             submitRecording()
         }
     }, [file]);
+
 
     const startRecording = async () => {
         try {
@@ -144,7 +149,19 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
         const secs = seconds % 60;
         return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
     };
+    
+    const { socketRef, webRtcRef, acceptOffer, setCallState, audioRef } = useSocketContext()
 
+    const callEndedHandler = () => {
+        setCallState('ended');
+        socketRef.current.endCall(details.sid)
+        
+        webRtcRef.current.destroy();
+        webRtcRef.current = new WebRTCManager();
+        setTimeout(() => {
+            setCallState(null)
+        }, 3000)
+    }
     return (
         <div className="fixed top-0 left-0 w-screen h-screen flex flex-col bg-black">
             <Navbar />
@@ -165,23 +182,30 @@ const CallerPage: React.FC<CallerPageProps> = ({ callState, details }) => {
                 </div>
                 {callState === "oncall" && isToggled && (
                     <div className="absolute top-[360px] left-1/2 transform -translate-x-1/2">
-                        <RecordButton onClick={toggleRecording} buttonState={buttonState} />
+                        <RecordButton onClick={toggleRecording} buttonState={buttonState}/>
                     </div>
                 )}
+                
+                <audio ref={audioRef} autoPlay />
+
                 <div className="flex flex-col items-center justify-center fixed bottom-8 w-full">
                     {(callState == "calling") && (
                         <RoundButton buttonType="reject" dimension={75} iconDimension={36} functionToHandle={() => console.log("Call button clicked")}/>
                     )}
                     {(callState == "incoming") && (
                         <div className="flex gap-[120px]"> 
-                            <RoundButton buttonType="call" dimension={75} iconDimension={36} functionToHandle={() => console.log("Call button clicked")}/>
-                            <RoundButton buttonType="reject" dimension={75} iconDimension={50} functionToHandle={() => console.log("Call button clicked")}/>
+                            <RoundButton buttonType="call" dimension={75} iconDimension={36} functionToHandle={async () => {
+                                console.log("clicked accept");
+                                await acceptOffer(details.sid, details.offer);
+                                setCallState('oncall');
+                            }}/>
+                            <RoundButton buttonType="reject" dimension={75} iconDimension={50} functionToHandle={callEndedHandler}/>
                         </div>
                     )}
                     {(callState == "oncall") && (
                         <div className="flex items-center justify-center gap-[40px]">
                             <CallSlider toggled={isToggled} setToggled={setIsToggled} />
-                            <RoundButton buttonType="end" dimension={75} iconDimension={36} functionToHandle={() => console.log("Call button clicked")}/>
+                            <RoundButton buttonType="end" dimension={75} iconDimension={36} functionToHandle={callEndedHandler}/>
                         </div>
                     )}
                 </div>

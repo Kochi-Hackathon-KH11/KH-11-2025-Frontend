@@ -7,6 +7,16 @@ export class WebRTCManager {
 
   public attachAudioElement(audioElement: HTMLAudioElement) {
     this.audioElement = audioElement;
+    if (this.peer != null)
+      this.peer.on('stream', this.attachStream)
+  }
+
+  public stopStream() {
+    this.localStream.getTracks().forEach(track => track.enabled = false);
+  }
+
+  public resumeStream() {
+    this.localStream.getTracks().forEach(track => track.enabled = false);
   }
 
   async initializeLocalStream(): Promise<MediaStream> {
@@ -17,21 +27,23 @@ export class WebRTCManager {
     return this.localStream;
   }
 
+  private attachStream = remoteStream => {
+    if (this.audioElement)
+      this.audioElement.srcObject = remoteStream;
+  }
+
   createPeer(initiator: boolean, stream: MediaStream, onSignal: (data: SimplePeer.SignalData) => void) {
     this.peer = new SimplePeer({
       initiator,
       stream,
+      trickle: false
     });
 
     this.peer.on('signal', (data) => {
       onSignal(data);
     });
 
-    this.peer.on('stream', (remoteStream) => {
-      if (this.audioElement) {
-        this.audioElement.srcObject = remoteStream;
-      }
-    });
+    this.peer.on('stream', this.attachStream);
 
     return this.peer;
   }
@@ -44,4 +56,5 @@ export class WebRTCManager {
     this.peer?.destroy();
     this.localStream?.getTracks().forEach((track) => track.stop());
   }
+
 }

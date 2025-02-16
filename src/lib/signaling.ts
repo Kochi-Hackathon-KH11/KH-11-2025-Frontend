@@ -12,6 +12,7 @@ export class Signaling extends EventEmitter {
     private onAuthenticated: () => void;
     private onAuthError: (message: string) => void;
     private onUsersUpdated: (users: any[]) => void;
+    private onEndCall: () => void;
 
     get users() {
         return this._users;
@@ -31,10 +32,18 @@ export class Signaling extends EventEmitter {
         this.socket.on('answer', this.handleAnswer);
         this.socket.on('candidate', this.handleCandidate);
         this.socket.on('users_updated', this.handleUsersUpdated);
+        this.socket.on("all_users", (data) => {
+            this._users = data;
+            console.log("hello", this._users)
+            this.emit('users-updated', data)
+        })
+        this.socket.on("end_call", this.handleEndCall);
         this._users = [];
         this.connect()
         this.socket.once('ack', () => {
-            this.authenticate("Mayank", "1234");
+            const token = localStorage.getItem('token')
+            if(token)
+                this.authenticate(token);
         })
     }
 
@@ -49,24 +58,22 @@ export class Signaling extends EventEmitter {
     }
 
     // Authenticate the user
-    authenticate(username: string, password: string): void {
-        this.socket.emit('authenticate_user', { username, password });
+    authenticate(jwt: string): void {
+        this.socket.emit('authenticate_user', { jwt });
         this.socket.once('authenticated', () => {
             this.socket.emit("get_all_users")
-            this.socket.once("all_users", (data) => {
-                this._users = data;
-                this.emit('users-updated', data)
-            })
+
         })
     }
 
     // send WebRTC offer
-    sendOffer(to: string, offer: any): void {
+    sendOffer(to: string, offer: any,): void {
         this.socket.emit('offer', { to, offer });
     }
 
     // send WebRTC answer
     sendAnswer(to: string, answer: any): void {
+        console.log("answer", to);
         this.socket.emit('answer', { to, answer });
     }
 
@@ -78,6 +85,10 @@ export class Signaling extends EventEmitter {
     // Fetch all users
     fetchAllUsers(): void {
         this.socket.emit('get_all_users');
+    }
+
+    endCall(to: string): void {
+        this.socket.emit('end_call', { to })
     }
 
     // Event handlers
@@ -119,6 +130,11 @@ export class Signaling extends EventEmitter {
             this.onUsersUpdated(users);
     };
 
+    private handleEndCall = () => {
+        if (this.onEndCall)
+            this.onEndCall();
+    }
+
     // Set event callbacks
     setOnAuthenticated(callback: () => void): void {
         this.onAuthenticated = callback;
@@ -142,6 +158,10 @@ export class Signaling extends EventEmitter {
 
     setOnUsersUpdated(callback: (users: any[]) => void): void {
         this.onUsersUpdated = callback;
+    }
+
+    setOnEndCall(callback: () => void): void {
+        this.onEndCall = callback;
     }
 
 }

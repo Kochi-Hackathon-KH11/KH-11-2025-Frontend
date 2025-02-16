@@ -1,47 +1,59 @@
 'use client'
 import CallerCard from "@/components/callerCard";
 import CallerPage, { CallState } from "@/components/callerPage";
+import { useSocketContext } from "@/hooks/useSocketContext";
 import { Signaling } from "@/lib/signaling";
 import { WebRTCManager } from "@/lib/webrtc";
 import { useEffect, useRef, useState } from "react";
 
 export default function Page() {
-    const socketRef = useRef<Signaling>(null);
-    const webRtcRef = useRef<WebRTCManager>(null);
-    const [users, setUsers] = useState([]);
-    const [callState, setCallState] = useState<CallState | null>(null);
 
-    const [callee, setCallee] = useState<{
-        username: string,
-        sid: String,
-    } | null>(null)
+    const { webRtcRef, users, sendOffer, socketRef, setCallState, setCallee, callState, callee } = useSocketContext();
 
-
-    useEffect(() => {
-        socketRef.current = new Signaling();
-        webRtcRef.current = new WebRTCManager();
-
-        const updateUsers = (data) => {
-            setUsers(data);
-        }
-
-        socketRef.current.on('users-updated', updateUsers);
-
-        return () => {
-            socketRef.current.off('users-updated', updateUsers);
-        }
-
-
-    }, []);
-
-
-    const offerHandler = (username: string, sid: string) => {
+    const offerHandler = async (username: string, sid: string) => {
         if (!webRtcRef.current)
             return;
 
         setCallState('calling')
         setCallee({ username, sid })
+        await sendOffer(sid)
     }
+
+    const answerHandler = (username: string, sid: string) => {
+        setCallState('calling')
+        setCallee({
+            username,
+            sid,
+        })
+    }
+
+    useEffect(() => {
+        if (!socketRef.current)
+            return;
+        socketRef.current.setOnOffer(async data => {
+            console.log(data)
+            setCallState('incoming');
+            const username = data['from']
+            const fromSid = data['from-sid']
+
+
+            setCallee({
+                username: username,
+                sid: fromSid,
+                offer: data.offer
+            })
+        })
+
+        socketRef.current.setOnEndCall(() => {
+            setCallState('ended')
+            webRtcRef.current.destroy();
+            webRtcRef.current = new WebRTCManager();
+            setTimeout(() => {
+                setCallState(null)
+            }, 3000)
+        })
+
+    }, [socketRef.current]);
 
     return (
         <>
