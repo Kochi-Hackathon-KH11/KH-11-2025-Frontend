@@ -1,0 +1,27 @@
+.future{
+    padding-block: 150px;
+}
+.future-card-container{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    /* column-gap: 40px; */
+    column-gap: 40px;
+    row-gap: 40px;
+    justify-content: center;
+}
+
+.future-content{
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.future-heading{
+    font-size: 48px;
+    font-weight: 700;
+}
+
+.future-subheading{
+    font-size: 24px;
+    font-family: 31px;
+    color: rgba(225,225,225, 0.5);
+}

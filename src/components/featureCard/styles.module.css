@@ -1,0 +1,27 @@
+.feature-card{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.feature-card-image-container{
+    height: 300px;
+    width: 400px;
+    border-radius: 8px;
+    background-color: azure;
+}
+.feature-card-image-container img{
+    border-radius: 8px;
+}
+.feature-card-content{
+    width: 400px;
+}
+.feature-title{
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 36px;
+}
+
+.feature-description{
+    font-size: 16px;
+    line-height: 21px;
+}

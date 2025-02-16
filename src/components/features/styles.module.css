@@ -1,0 +1,28 @@
+.feature{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+    /* border: 1px solid red; */
+    padding-block: 72px;
+}
+.feature-solution{
+    
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    gap:24px;
+}
+.solution-title{
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 48px;
+}
+
+.solution-description{
+    font-size: 16px;
+    line-height: 21px;
+}

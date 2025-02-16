@@ -55,7 +55,7 @@
     gap: 24px;
 
 }
-.hero-button-demo, .hero-button-start{
+.hero-button-demo{
     font-size: 16px;
     /* border: 1px solid white; */
     height: 50px;
@@ -67,9 +67,25 @@
     background: linear-gradient(90deg, #78B3CD 0%, #482C9D 50%, #8B1A9C 100%);
 }
 
+.hero-button-start-outter{
+    width: 172px;
+    background: linear-gradient(90deg, #78B3CD 0%, #482C9D 50%, #8B1A9C 100%);
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .hero-button-start{
      /* Gradient Border */
-    border: 1px solid white;
-    border-image-source: linear-gradient(to right, #78B3CD, #482C9D, #8B1A9C);
-    border-image-slice: 1;
+     height: 94%;
+     background-color: black;
+     width: 98%;
+     font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+}
+.hero-button-start-outter:hover{
+    cursor: pointer;
 }
