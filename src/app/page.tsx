@@ -1,5 +1,5 @@
 import AudioPlayer from "@/components/AudioPlayer";
-import HomeSection from "@/components/home/home";
+import HomeSection from "@/components/home";
 import RecordLayout from "@/components/RecordLayout"
 export default function Home() {
   return (

@@ -1,0 +1,43 @@
+.problem{
+    display: flex;
+    gap: 72px;
+    justify-content: center;
+    padding-block: 150px;
+}
+.problem-statement{
+    width: 355px;
+    font-size: 24px;
+    line-height: 31px;
+}
+.problem-statement-span{
+    font-size: 72px;
+    line-height: 93px;
+    font-weight: 700;
+    background: linear-gradient(180deg, #E11013 7.53%, #E116CD 37.68%, #9972E7 66.99%, #FCFEFF 92.47%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.problem-impact{
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap:32px;
+    font-size: 24px;
+    line-height: 31px;
+    font-size: 24px;
+    border-radius: 8px;
+    background: linear-gradient(105deg, #391CE0 2.21%, #BB5BBD 78.7%, #FFF 117.24%);
+}
+
+.impact-tag{
+    padding: 4px 24px;
+    border-radius: 4px;
+    width: max-content;
+    background-color: #000000;
+}
+
+.problem-statement-content{
+    width: 420px;
+}

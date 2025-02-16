@@ -1,0 +1,75 @@
+.hero{
+    /* height: 100svh; */
+    height: 900px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-image: url(./../../../public/hero-waves.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.hero-content{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: max-content;
+    align-items: center;
+    z-index: 2;
+}
+
+
+.hero-subheading{
+    font-size: 64px;
+    /* line-height: 72px; */
+}
+
+.hero-sparkle-container{
+    position: absolute;
+    right: 15%;
+}
+.hero-heading{
+    font-size: 96px;
+    /* line-height: 96px; */
+    font-weight: 700;
+    padding: 10px 28px;
+    /* border: 1px solid white; */
+}
+
+.hero-description{
+    margin-top: 6px;
+    font-size: 24px;
+    padding-inline: 12px;
+    color: #B8B6FF;
+}
+
+.hero-heading, .hero-description{
+    background: rgba(0, 0, 0, 0.20);
+    backdrop-filter: blur(7.5px);
+}
+
+.hero-button-container{
+    margin-top: 64px;
+    display: flex;
+    gap: 24px;
+
+}
+.hero-button-demo, .hero-button-start{
+    font-size: 16px;
+    /* border: 1px solid white; */
+    height: 50px;
+    padding-inline: 45px;
+    border-radius: 50px;
+}
+
+.hero-button-demo{
+    background: linear-gradient(90deg, #78B3CD 0%, #482C9D 50%, #8B1A9C 100%);
+}
+
+.hero-button-start{
+     /* Gradient Border */
+    border: 1px solid white;
+    border-image-source: linear-gradient(to right, #78B3CD, #482C9D, #8B1A9C);
+    border-image-slice: 1;
+}
